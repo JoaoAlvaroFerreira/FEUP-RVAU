@@ -9,16 +9,18 @@ public class Fire : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-    
+
     }
-    public void FireBullet(){
-             Instantiate(bullet, player.transform.position, player.transform.rotation);
-             
+
+    public void FireBullet()
+    {
+        Instantiate(bullet, player.transform.position, player.transform.rotation);
+
     }
 }
