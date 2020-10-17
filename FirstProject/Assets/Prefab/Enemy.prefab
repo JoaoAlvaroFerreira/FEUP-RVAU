@@ -11,10 +11,11 @@ GameObject:
   - component: {fileID: 3892920010789103349}
   - component: {fileID: 1500852068404891881}
   - component: {fileID: 1791574848342610357}
-  - component: {fileID: 2581792228214647441}
   - component: {fileID: 4117481707968439460}
+  - component: {fileID: 2581792228214647441}
   - component: {fileID: 5550411543679955831}
   - component: {fileID: -1248502120859375433}
+  - component: {fileID: 5541219891033802252}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -85,20 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &2581792228214647441
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5679752195491115419}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &4117481707968439460
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -115,6 +102,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &2581792228214647441
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5679752195491115419}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &5550411543679955831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,7 +128,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 735f6796176a202489d197c52759bec0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2.54
 --- !u!195 &-1248502120859375433
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -150,3 +150,16 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &5541219891033802252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5679752195491115419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06e3f482d0d627847a66e5cacf6d5ec3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyInstance: {fileID: 5679752195491115419}
