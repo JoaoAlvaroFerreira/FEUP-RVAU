@@ -19,12 +19,11 @@ public class CollisionWithBullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other) 
     {
-        Debug.Log(other.gameObject.tag);
-        Debug.Log("aaa");
         if (other.gameObject.tag == "Bullet")
         {
             Destroy(other.gameObject);
-            Destroy(this.enemyInstance);
+            GameController.deleteEnemy(gameObject);
+            Destroy(gameObject);
             //or gameObject.SetActive(false);
         }
     }
