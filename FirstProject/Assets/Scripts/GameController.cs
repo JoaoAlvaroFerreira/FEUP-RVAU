@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour
 
     public GameObject mainMarker;
     public GameObject enemy1;
+    public float EnemySpawnRate = 1f;
 
     private static LinkedList<GameObject> enemies;
 
@@ -24,7 +25,7 @@ public class GameController : MonoBehaviour
     void Update()
     {
         time += Time.deltaTime;
-        if (time > 1f)
+        if (time > EnemySpawnRate)
         {
             Vector2 circleRandom = Random.insideUnitCircle.normalized * Random.Range(10, 15);
             Vector3 pos = new Vector3(circleRandom.x, 0.1f, circleRandom.y);
