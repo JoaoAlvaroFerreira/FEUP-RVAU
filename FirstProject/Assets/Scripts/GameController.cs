@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour
         if (time > EnemySpawnRate)
         {
             Vector2 circleRandom = Random.insideUnitCircle.normalized * Random.Range(10, 15);
-            Vector3 pos = new Vector3(circleRandom.x, 0.1f, circleRandom.y);
+            Vector3 pos = new Vector3(circleRandom.x, 0f, circleRandom.y);
             var obj = Instantiate(enemy1, pos, Quaternion.identity);
             obj.transform.SetParent(mainMarker.transform);
             time = 0;

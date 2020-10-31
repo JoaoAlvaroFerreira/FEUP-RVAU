@@ -139,8 +139,10 @@ public class Weather : MonoBehaviour
             if (!webRequest.isNetworkError)
             {
                 externalLocationInformation = JsonUtility.FromJson<ExternalLocationInformation>(webRequest.downloadHandler.text);
-                webRequest = UnityWebRequest.Get("http://api.openweathermap.org/data/2.5/weather?q=" + externalLocationInformation.geoplugin_city + "&appid=d67b3b963691d6ea4b8f646ac3fb3337");
+                webRequest = UnityWebRequest.Get("http://api.openweathermap.org/data/2.5/weather?q=" + "London" + "&appid=d67b3b963691d6ea4b8f646ac3fb3337");
                 yield return webRequest.SendWebRequest();
+                Debug.Log("WE ARE IN:");
+                Debug.Log(externalLocationInformation.geoplugin_city);
                 if (!webRequest.isNetworkError)
                 {
                     externalWeatherInformation = JsonUtility.FromJson<ExternalWeatherInformation>(webRequest.downloadHandler.text);
