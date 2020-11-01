@@ -8,11 +8,16 @@ public class FindAndFireTower : MonoBehaviour
     public float fire_interval = 1f;
     public float bullet_spawn_offset = 1f;
     private float time;
+
+    private Transform head;
+    private Transform turret;
     // Start is called before the first frame update
     void Start()
     {
         this.gameObject.SetActive(false);
         time = 0;
+        this.head = this.transform.Find("Base/Pylon");
+        this.turret = this.transform.Find("Base/Pylon/Turret");
     }
 
     // Update is called once per frame
@@ -26,7 +31,7 @@ public class FindAndFireTower : MonoBehaviour
         GameObject closest_enemy = null;
         foreach(var enemy in enemies)
         {
-            float distance = Vector2.Distance(new Vector2(this.transform.position.x, this.transform.position.z), new Vector2(enemy.transform.position.x, enemy.transform.position.z));
+            float distance = Vector2.Distance(new Vector2(this.turret.transform.position.x, this.turret.transform.position.z), new Vector2(enemy.transform.position.x, enemy.transform.position.z));
             if(shortest_distance > distance)
             {
                 shortest_distance = distance;
@@ -35,11 +40,11 @@ public class FindAndFireTower : MonoBehaviour
         }
         if(closest_enemy)
         {
-            var rotation = Quaternion.LookRotation(closest_enemy.transform.position - this.transform.position, Vector3.up);
-            this.transform.rotation = rotation * Quaternion.Euler(0, 90, 0);
+            var rotation = Quaternion.LookRotation(closest_enemy.transform.position - this.turret.transform.position, Vector3.up);
+            this.turret.rotation = rotation * Quaternion.Euler(0, -90, 0);
             if (time >= fire_interval)
             {
-                Instantiate(bullet, this.transform.position + (rotation * Vector3.forward * bullet_spawn_offset), rotation);
+                Instantiate(bullet, this.turret.transform.position + (rotation * Vector3.forward * bullet_spawn_offset), rotation);
                 time = 0;
             }
         }

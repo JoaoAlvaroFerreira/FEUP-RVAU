@@ -17,7 +17,7 @@ public class Movement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        target = new Vector3(0, 0.1f, 0);
+        target = new Vector3(0, 0.5f, 0);
         agent = GetComponent<NavMeshAgent>();
         anim.SetBool("isCharging", true);
        
