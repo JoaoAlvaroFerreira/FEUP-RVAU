@@ -8,7 +8,6 @@ public class Movement : MonoBehaviour
 
     private NavMeshAgent agent;
 
-    private bool attacking;
     private Vector3 target;
 
     //private GameObject mainMarker;
@@ -21,7 +20,7 @@ public class Movement : MonoBehaviour
         target = new Vector3(0, 0.1f, 0);
         agent = GetComponent<NavMeshAgent>();
         anim.SetBool("isCharging", true);
-        attacking = false;
+       
     }
 
    
@@ -46,7 +45,7 @@ public class Movement : MonoBehaviour
                 {
                     if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                     {
-                        Debug.Log("IS ATTACKING");
+                        
                         attack();
                     }
                 }
@@ -56,7 +55,6 @@ public class Movement : MonoBehaviour
     }
 
     void attack(){
-        attacking = true;
         anim.SetBool("isCharging", false);
         anim.SetBool("isAttacking", true);
     }

@@ -13,9 +13,14 @@ public class TakeDamage : MonoBehaviour
     public int fullHealth = 40;
     public int currentHealth = 40;
     public Slider ui;   
+
+    public GameObject gameOverMenu;
     void Update()
     {
         ui.value = currentHealth;
+
+        if(currentHealth < 1)
+        gameOver();
     }
     // Update is called once per frame
 
@@ -30,5 +35,11 @@ public class TakeDamage : MonoBehaviour
         }
 
        
+    }
+
+    void gameOver()
+    {
+        Time.timeScale = 0.0f;
+        gameOverMenu.SetActive(true);
     }
 }
