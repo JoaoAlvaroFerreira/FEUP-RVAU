@@ -24,11 +24,7 @@ public class Movement : MonoBehaviour
         attacking = false;
     }
 
-    // Update is called once per frame
-    private void FixedUpdate() {
-        if(attacking)
-        Debug.Log("aaaaaaaaaa");    
-    }
+   
     void Update()
     {
 
