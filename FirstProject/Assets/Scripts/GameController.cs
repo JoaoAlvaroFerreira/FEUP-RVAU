@@ -11,6 +11,10 @@ public class GameController : MonoBehaviour
     public GameObject enemy1;
     public float EnemySpawnRate = 1f;
 
+    public int minimum_range = 10;
+    public int maximum_range = 15;
+
+
     private static LinkedList<GameObject> enemies;
 
 
