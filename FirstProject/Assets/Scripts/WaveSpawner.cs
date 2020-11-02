@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.AI;
 
 
 public class WaveSpawner : MonoBehaviour
@@ -92,7 +92,19 @@ public class WaveSpawner : MonoBehaviour
         if (nextWave + 1 > waves.Length - 1)
         {
             nextWave = 0;
-            Debug.Log("ALL WAVES COMPLETE! Looping...");
+            Debug.Log("ALL WAVES COMPLETE! Increasing level...");
+
+            for(int i = 0; i < waves.Length; i++)
+            {
+                waves[i].count += 10;
+                var navMeshComp = enemy1.GetComponent(typeof(NavMeshAgent)) as NavMeshAgent;
+
+                if(navMeshComp.speed < 4)
+                {
+                    navMeshComp.speed += 0.3f;
+                }
+            }
+
         }
         else
         {
