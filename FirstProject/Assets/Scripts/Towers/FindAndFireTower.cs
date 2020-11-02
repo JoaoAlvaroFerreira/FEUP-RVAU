@@ -26,14 +26,16 @@ public class FindAndFireTower : MonoBehaviour
         time += Time.deltaTime;
         if (time >= fire_interval + 1)
             time = fire_interval;
-        var enemies = GameController.getEnemies();
+        var enemies = WaveSpawner.getEnemiesFromWave();
         float shortest_distance = float.MaxValue;
         GameObject closest_enemy = null;
+
         foreach(var enemy in enemies)
         {
             float distance = Vector2.Distance(new Vector2(this.turret.transform.position.x, this.turret.transform.position.z), new Vector2(enemy.transform.position.x, enemy.transform.position.z));
             if(shortest_distance > distance)
             {
+                Debug.Log("See enemy, firing!");
                 shortest_distance = distance;
                 closest_enemy = enemy;
             }

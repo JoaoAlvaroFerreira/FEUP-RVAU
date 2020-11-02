@@ -161,7 +161,7 @@ public class WaveSpawner : MonoBehaviour
     {
         enemies.Remove(enemy);
     }
-    public static LinkedList<GameObject> getEnemies()
+    public static LinkedList<GameObject> getEnemiesFromWave()
     {
         return enemies;
     }
