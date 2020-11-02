@@ -14,9 +14,9 @@ public class GameController : MonoBehaviour
     public int minimum_range = 10;
     public int maximum_range = 15;
 
-
     private static LinkedList<GameObject> enemies;
 
+    private static CustomTrackableEventHandler trackableEventHandler;
 
     // Start is called before the first frame update
     void Start()
@@ -28,15 +28,19 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        time += Time.deltaTime;
-        if (time > EnemySpawnRate)
-        {
-            Vector2 circleRandom = Random.insideUnitCircle.normalized * Random.Range(10, 15);
-            Vector3 pos = new Vector3(circleRandom.x, 0f, circleRandom.y);
-            var obj = Instantiate(enemy1, pos, Quaternion.identity);
-            obj.transform.SetParent(mainMarker.transform);
-            time = 0;
-            enemies.AddFirst(obj);
+        trackableEventHandler = transform.parent.GetComponent<CustomTrackableEventHandler>();
+
+        if(trackableEventHandler.targetFound){
+            time += Time.deltaTime;
+            if (time > EnemySpawnRate)
+            {
+                Vector2 circleRandom = Random.insideUnitCircle.normalized * Random.Range(10, 15);
+                Vector3 pos = new Vector3(circleRandom.x, 0f, circleRandom.y);
+                var obj = Instantiate(enemy1, pos, Quaternion.identity);
+                obj.transform.SetParent(mainMarker.transform);
+                time = 0;
+                enemies.AddFirst(obj);
+            }
         }
     }
 
