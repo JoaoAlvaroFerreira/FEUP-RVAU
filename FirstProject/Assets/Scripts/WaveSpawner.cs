@@ -108,6 +108,14 @@ public class WaveSpawner : MonoBehaviour
         }
         else
         {
+
+            GameObject[] turrets;
+            turrets = GameObject.FindGameObjectsWithTag("Turret");
+            foreach(GameObject turret in turrets)
+            {
+                turret.GetComponent<FindAndFireTower>().replenishBullets();
+            }
+
             nextWave++;
         }
     }
