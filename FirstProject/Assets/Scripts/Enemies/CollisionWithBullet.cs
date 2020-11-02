@@ -22,7 +22,7 @@ public class CollisionWithBullet : MonoBehaviour
         if (other.gameObject.tag == "Bullet")
         {
             Destroy(other.gameObject);
-            GameController.deleteEnemy(gameObject);
+            WaveSpawner.deleteEnemyFromWave(gameObject);
             Destroy(gameObject);
             //or gameObject.SetActive(false);
         }
