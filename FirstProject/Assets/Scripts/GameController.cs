@@ -16,7 +16,12 @@ public class GameController : MonoBehaviour
 
     private static LinkedList<GameObject> enemies;
 
-    private static CustomTrackableEventHandler trackableEventHandler;
+    private bool spawning = false;
+
+    public void startSpawning()
+    {
+        spawning = true;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -28,9 +33,7 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        trackableEventHandler = transform.parent.GetComponent<CustomTrackableEventHandler>();
-
-        if(trackableEventHandler.targetFound){
+        if(spawning){
             time += Time.deltaTime;
             if (time > EnemySpawnRate)
             {
