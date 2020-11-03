@@ -6,10 +6,12 @@ using UnityEngine.UI;
 public class FindAndFireTower : MonoBehaviour
 {
     public GameObject bullet;
-    public float fire_interval = 0.5f;
+    public float fire_interval = 1f;
 
     public int bulletsLeft = 20;
     public Slider bulletUi;
+
+    public AudioSource audio;
 
     public void replenishBullets()
     {
@@ -58,6 +60,7 @@ public class FindAndFireTower : MonoBehaviour
             if (time >= fire_interval && bulletsLeft > 0)
             {
                 Instantiate(bullet, this.turret.transform.position + (rotation * Vector3.forward * bullet_spawn_offset), rotation);
+                audio.Play();
                 time = 0;
                 bulletsLeft -= 1;
             }

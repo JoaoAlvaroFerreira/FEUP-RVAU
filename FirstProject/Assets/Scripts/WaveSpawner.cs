@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using TMPro;
 
 
 public class WaveSpawner : MonoBehaviour
@@ -20,6 +21,9 @@ public class WaveSpawner : MonoBehaviour
     public int nextWave = 0;
     public float timeBetweenWaves = 5f;
     public float waveCountdown;
+
+    public TextMeshProUGUI text;
+    public GameObject canvas;
 
     private float searchCountdown = 1f;
 
@@ -44,9 +48,16 @@ public class WaveSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Starting wave spawner!");
+        StartCoroutine(printMessage("Starting wave spawner!"));
         waveCountdown = timeBetweenWaves;
         enemies = new LinkedList<GameObject>();
+    }
+
+    private IEnumerator printMessage(string str){
+        text.text = str;
+        canvas.SetActive(true);
+        yield return new WaitForSeconds(3);
+        canvas.SetActive(false);
     }
 
     // Update is called once per frame
@@ -58,7 +69,7 @@ public class WaveSpawner : MonoBehaviour
             {
                 if (!EnemyIsAlive())
                 {
-                    Debug.Log("Wave completed!");
+                    StartCoroutine(printMessage("Wave Completed"));
                     WaveCompleted();
                 }
                 else
@@ -84,7 +95,6 @@ public class WaveSpawner : MonoBehaviour
 
     private void WaveCompleted()
     {
-        Debug.Log("Wave Completed!");
 
         state = SpawnState.COUNTING;
         waveCountdown = timeBetweenWaves;
@@ -92,7 +102,8 @@ public class WaveSpawner : MonoBehaviour
         if (nextWave + 1 > waves.Length - 1)
         {
             nextWave = 0;
-            Debug.Log("ALL WAVES COMPLETE! Increasing level...");
+            StartCoroutine(printMessage("ALL WAVES COMPLETE! Increasing level..."));
+        
 
             for(int i = 0; i < waves.Length; i++)
             {
@@ -137,7 +148,8 @@ public class WaveSpawner : MonoBehaviour
 
     private IEnumerator SpawnWave(Wave _wave)
     {
-        Debug.Log("Spawning wave: " + _wave.name);
+        StartCoroutine(printMessage("Spawning wave: " + _wave.name));
+   
         state = SpawnState.SPAWNING;
 
         // Spawn

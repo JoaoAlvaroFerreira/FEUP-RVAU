@@ -12,6 +12,8 @@ public class SpaceshipController : MonoBehaviour
 
     public float below_spaceship = 2f;
 
+    public AudioSource audio;
+
     private float offset = 0.05f;
 
     // Start is called before the first frame update
@@ -45,5 +47,6 @@ public class SpaceshipController : MonoBehaviour
         }
         Vector3 spawn_point = new Vector3(transform.position.x, transform.position.y - below_spaceship, transform.position.z);
         GameObject bullet_object = Instantiate(bullet, spawn_point, Quaternion.LookRotation((point - spawn_point).normalized));
+        audio.Play();
     }
 }
