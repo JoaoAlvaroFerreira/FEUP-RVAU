@@ -13,10 +13,16 @@ public class TakeDamage : MonoBehaviour
     public int fullHealth = 40;
     public int currentHealth = 40;
     public Slider ui;   
+    
+    public float timeTotal;
 
     public GameObject gameOverMenu;
+    private void Start() {
+        timeTotal = 0;
+    }
     void Update()
     {
+        timeTotal++;
         ui.value = currentHealth;
 
         if(currentHealth < 1)

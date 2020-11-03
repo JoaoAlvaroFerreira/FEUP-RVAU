@@ -29,4 +29,10 @@ public class BulletScript : MonoBehaviour
         m_Rigidbody.AddForce(m_Rigidbody.transform.forward * m_Speed);
         Destroy(gameObject, m_Lifespan);
     }
+
+    void Update() {
+        if(gameObject.transform.position.y < 0){
+            Destroy(gameObject);
+        }
+    }
 }

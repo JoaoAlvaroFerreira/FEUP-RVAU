@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    private float time;
+    public float time;
 
     public GameObject mainMarker;
     public GameObject enemy1;
@@ -33,8 +33,10 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if(spawning){
             time += Time.deltaTime;
+           
             if (time > EnemySpawnRate)
             {
                 Vector2 circleRandom = Random.insideUnitCircle.normalized * Random.Range(10, 15);

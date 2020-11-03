@@ -48,7 +48,7 @@ public class WaveSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(printMessage("Starting wave spawner!"));
+        StartCoroutine(printMessage("Enemies are coming!"));
         waveCountdown = timeBetweenWaves;
         enemies = new LinkedList<GameObject>();
     }
