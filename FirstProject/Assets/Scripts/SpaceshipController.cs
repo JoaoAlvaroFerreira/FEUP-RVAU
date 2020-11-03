@@ -30,6 +30,8 @@ public class SpaceshipController : MonoBehaviour
 
     public void FireBullet()
     {
+        Debug.Log("Time:"+ Time.timeScale);
+        Time.timeScale = 1.0f;
         RaycastHit[] hits = Physics.RaycastAll(camera.transform.position, camera.transform.forward);
         Vector3 point = new Vector3(0,0,0);
         bool enemy_detected = false;

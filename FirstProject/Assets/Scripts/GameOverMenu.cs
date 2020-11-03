@@ -3,22 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using Vuforia;
 public class GameOverMenu : MonoBehaviour
 {
-   public GameObject game;
-   public TextMeshProUGUI text;
-    private void Start() {
+    public GameObject game;
+    public TextMeshProUGUI text;
+    private void Start()
+    {
         Debug.Log("Start");
-        text.text = "High Score: " +  game.GetComponent<TakeDamage>().timeTotal;
+        text.text = "High Score: " + game.GetComponent<TakeDamage>().timeTotal;
     }
-    public void quitToMenu(){
-         
+    public void quitToMenu()
+    {
+
         SceneManager.LoadScene("MenuScene");
-    
+
     }
-    public void restartGame(){
-        Time.timeScale = 1.0f;
-        SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
-        Time.timeScale = 1.0f;
+    public void restartGame()
+    {
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+
+        Debug.Log("Time ReStart:" + Time.timeScale);
     }
 }

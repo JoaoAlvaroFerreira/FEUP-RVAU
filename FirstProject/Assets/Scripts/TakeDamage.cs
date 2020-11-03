@@ -45,7 +45,7 @@ public class TakeDamage : MonoBehaviour
 
     void gameOver()
     {
-        Time.timeScale = 0.0f;
+     
         gameOverMenu.SetActive(true);
     }
 }
