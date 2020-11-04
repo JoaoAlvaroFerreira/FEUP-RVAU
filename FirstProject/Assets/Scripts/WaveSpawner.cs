@@ -37,6 +37,7 @@ public class WaveSpawner : MonoBehaviour
 
 
     public GameObject mainMarker;
+    public GameObject gravityGenerator;
     public GameObject enemy1;
 
     public int minimum_range = 10;
@@ -54,15 +55,15 @@ public class WaveSpawner : MonoBehaviour
     private void Awake() {
         
         difficulty = MenuScript.difficulty;
-
+        Debug.Log("difficulty: "+ difficulty);
         switch(difficulty){
-            case 1:
+            case 0.2f:
             DifficultyHUD.text = "Difficulty: Easy";
             break;
-            case 3:
+            case 1.0f:
             DifficultyHUD.text = "Difficulty: Normal";
             break;
-            case 6:
+            case 5.0f:
             DifficultyHUD.text = "Difficulty: Hard";
             break;
 
@@ -90,9 +91,11 @@ public class WaveSpawner : MonoBehaviour
     {
         if (spawning)
         {
-            
-        timeTotal += difficulty;
-        ScoreHUD.text = "Score: " + timeTotal;
+        if(gravityGenerator.GetComponent<TakeDamage>().currentHealth > 0){
+                timeTotal += difficulty;
+        }
+        
+        ScoreHUD.text = "Score: " + (int)timeTotal;
             if (state == SpawnState.WAITING)
             {
                 if (!EnemyIsAlive())

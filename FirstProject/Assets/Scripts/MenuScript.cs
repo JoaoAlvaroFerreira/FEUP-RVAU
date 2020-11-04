@@ -9,7 +9,7 @@ public class MenuScript : MonoBehaviour
     public static float difficulty;
 
     private void Start(){
-        difficulty=1f;
+        difficulty=0.2f;
     }
 
     public void PlayGame()
@@ -26,11 +26,11 @@ public class MenuScript : MonoBehaviour
             Debug.Log("Changed to Easy");
             break;
             case 1:
-            difficulty = 1f;
+            difficulty = 1.0f;
             Debug.Log("Changed to Normal");
             break;
             case 2:
-            difficulty = 5f;
+            difficulty = 5.0f;
             Debug.Log("Changed to Hard");
             break;
         }
