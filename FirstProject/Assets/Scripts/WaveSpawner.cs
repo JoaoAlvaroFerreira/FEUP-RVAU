@@ -27,6 +27,10 @@ public class WaveSpawner : MonoBehaviour
     public TextMeshProUGUI text;
     public GameObject canvas;
 
+    public TextMeshProUGUI DifficultyHUD;
+    public TextMeshProUGUI ScoreHUD;
+    public float timeTotal;
+
     private float searchCountdown = 1f;
 
     private SpawnState state = SpawnState.COUNTING;
@@ -50,11 +54,25 @@ public class WaveSpawner : MonoBehaviour
     private void Awake() {
         
         difficulty = MenuScript.difficulty;
+
+        switch(difficulty){
+            case 1:
+            DifficultyHUD.text = "Difficulty: Easy";
+            break;
+            case 3:
+            DifficultyHUD.text = "Difficulty: Normal";
+            break;
+            case 6:
+            DifficultyHUD.text = "Difficulty: Hard";
+            break;
+
+
+        }
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+        timeTotal = 0;
         StartCoroutine(printMessage("Enemies are coming!"));
         waveCountdown = timeBetweenWaves;
         enemies = new LinkedList<GameObject>();
@@ -70,9 +88,11 @@ public class WaveSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Difficulty: "+difficulty);
         if (spawning)
         {
+            
+        timeTotal += difficulty;
+        ScoreHUD.text = "Score: " + timeTotal;
             if (state == SpawnState.WAITING)
             {
                 if (!EnemyIsAlive())

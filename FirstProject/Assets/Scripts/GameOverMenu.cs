@@ -11,7 +11,7 @@ public class GameOverMenu : MonoBehaviour
     private void Start()
     {
         Debug.Log("Start");
-        text.text = "High Score: " + game.GetComponent<TakeDamage>().timeTotal;
+        text.text = "High Score: " + game.GetComponent<WaveSpawner>().timeTotal;
     }
     public void quitToMenu()
     {

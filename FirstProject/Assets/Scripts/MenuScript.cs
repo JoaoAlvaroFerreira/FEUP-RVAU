@@ -22,15 +22,15 @@ public class MenuScript : MonoBehaviour
        
         switch(s){
             case 0:
-            difficulty = 1f;
+            difficulty = 0.2f;
             Debug.Log("Changed to Easy");
             break;
             case 1:
-            difficulty = 3f;
+            difficulty = 1f;
             Debug.Log("Changed to Normal");
             break;
             case 2:
-            difficulty = 6f;
+            difficulty = 5f;
             Debug.Log("Changed to Hard");
             break;
         }

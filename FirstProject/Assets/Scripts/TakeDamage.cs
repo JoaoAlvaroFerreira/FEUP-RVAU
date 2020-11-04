@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class TakeDamage : MonoBehaviour
 {
@@ -14,15 +15,13 @@ public class TakeDamage : MonoBehaviour
     public int currentHealth = 40;
     public Slider ui;   
     
-    public float timeTotal;
-
     public GameObject gameOverMenu;
     private void Start() {
-        timeTotal = 0;
+    
     }
     void Update()
     {
-        timeTotal++;
+       
         ui.value = currentHealth;
 
         if(currentHealth < 1)
