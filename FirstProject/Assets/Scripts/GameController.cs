@@ -7,6 +7,8 @@ public class GameController : MonoBehaviour
 {
     public float time;
 
+    public float difficulty;
+
     public GameObject mainMarker;
     public GameObject enemy1;
     public float EnemySpawnRate = 1f;
@@ -26,6 +28,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        difficulty = 1.0f;
         Time.timeScale = 1.0f;
         time = 0;
         enemies = new LinkedList<GameObject>();
@@ -34,11 +37,14 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        if(spawning){
+
+        if (spawning)
+        {
+            Debug.Log("Difficulty: " + difficulty);
+
             time += Time.deltaTime;
-           
-            if (time > EnemySpawnRate)
+
+            if (time > EnemySpawnRate * difficulty)
             {
                 Vector2 circleRandom = Random.insideUnitCircle.normalized * Random.Range(10, 15);
                 Vector3 pos = new Vector3(circleRandom.x, 0f, circleRandom.y);

@@ -9,6 +9,8 @@ public class WaveSpawner : MonoBehaviour
 {
     public enum SpawnState { SPAWNING, WAITING, COUNTING };
 
+    public float difficulty;
+
     [System.Serializable]
     public class Wave
     {
@@ -45,9 +47,14 @@ public class WaveSpawner : MonoBehaviour
         spawning = true;
     }
 
+    private void Awake() {
+        
+        difficulty = MenuScript.difficulty;
+    }
     // Start is called before the first frame update
     void Start()
     {
+        
         StartCoroutine(printMessage("Enemies are coming!"));
         waveCountdown = timeBetweenWaves;
         enemies = new LinkedList<GameObject>();
@@ -63,6 +70,7 @@ public class WaveSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log("Difficulty: "+difficulty);
         if (spawning)
         {
             if (state == SpawnState.WAITING)
@@ -153,7 +161,7 @@ public class WaveSpawner : MonoBehaviour
         state = SpawnState.SPAWNING;
 
         // Spawn
-        for (int i = 0; i < _wave.count; i++)
+        for (int i = 0; i < _wave.count*difficulty; i++)
         {
             SpawnEnemy();
             yield return new WaitForSeconds(1f / _wave.rate);

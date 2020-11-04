@@ -17,6 +17,7 @@ public class GameOverMenu : MonoBehaviour
     {
 
         SceneManager.LoadScene("MenuScene");
+        
 
     }
     public void restartGame()
