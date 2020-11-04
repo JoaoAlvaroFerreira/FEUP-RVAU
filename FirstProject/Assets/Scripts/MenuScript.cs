@@ -38,6 +38,7 @@ public class MenuScript : MonoBehaviour
 
     public void QuitGame()
     {
+        System.Diagnostics.Process.GetCurrentProcess().Kill();
         Application.Quit();
     }
 }
