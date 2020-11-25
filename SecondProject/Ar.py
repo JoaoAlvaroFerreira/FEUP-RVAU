@@ -183,8 +183,7 @@ def main():
         search_params = dict(checks=50)   # or pass empty dictionary
         flann = cv.FlannBasedMatcher(index_params, search_params)
 
-        MIN_MATCHES = 20
-        print(MIN_MATCHES)
+        MIN_MATCHES = len(referenceImagePts) / 30
 
         while True:
             frame = capture.read()
@@ -231,8 +230,11 @@ def main():
                 corners = np.float32(
                     [[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]
                 ).reshape(-1, 1, 2)
-                transformedCorners = cv.perspectiveTransform(
-                    corners, homography)
+                try:
+                    transformedCorners = cv.perspectiveTransform(
+                        corners, homography)
+                except:
+                    continue
 
                 # Draw a polygon on the second image joining the transformed corners
                 frame = cv.polylines(
