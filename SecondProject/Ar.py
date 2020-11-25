@@ -178,7 +178,7 @@ def main():
             referenceImage, None)
 
         MIN_MATCHES = len(referenceImagePts) / 4
-        print(MIN_MATCHES)
+
         while True:
             frame = capture.read()
 
