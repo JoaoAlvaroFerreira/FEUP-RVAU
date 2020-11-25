@@ -167,17 +167,24 @@ def main():
         # Scale 3D model
         scale3d = 1
 
-        # ORB detector
-        orb = cv.ORB_create()
+        sift = cv.SIFT_create()
 
         # brute force matcher
         bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
 
         # Compute model keypoints and its descriptors
-        referenceImagePts, referenceImageDsc = orb.detectAndCompute(
+        referenceImagePts, referenceImageDsc = sift.detectAndCompute(
             referenceImage, None)
 
-        MIN_MATCHES = len(referenceImagePts) / 4
+        # FLANN parameters
+        FLANN_INDEX_KDTREE = 1
+        # TODO change this values or try explore dictionaries
+        index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+        search_params = dict(checks=50)   # or pass empty dictionary
+        flann = cv.FlannBasedMatcher(index_params, search_params)
+
+        MIN_MATCHES = 20
+        print(MIN_MATCHES)
 
         while True:
             frame = capture.read()
@@ -185,29 +192,33 @@ def main():
             # ============== Recognize =============
 
             # Compute scene keypoints and its descriptors
-            sourceImagePts, sourceImageDsc = orb.detectAndCompute(frame, None)
+            sourceImagePts, sourceImageDsc = sift.detectAndCompute(frame, None)
 
             # ============== Matching =============
 
             # Match frame descriptors with model descriptors
             try:
-                matches = bf.match(referenceImageDsc, sourceImageDsc)
+                matches = flann.knnMatch(
+                    referenceImageDsc, sourceImageDsc, k=2)
             except:
                 continue
 
-            # Sort them in the order of their distance
-            matches = sorted(matches, key=lambda x: x.distance)
+            # -- Filter matches using the Lowe's ratio test
+            ratio_thresh = 0.7
+            good_matches = []
+            for m, n in matches:
+                if m.distance < ratio_thresh*n.distance:
+                    good_matches.append(m)
 
             # ============== Homography =============
-
             # Apply the homography transformation if we have enough good matches
-            if len(matches) > MIN_MATCHES:
+            if len(good_matches) > MIN_MATCHES:
                 # Get the good key points positions
                 sourcePoints = np.float32(
-                    [referenceImagePts[m.queryIdx].pt for m in matches]
+                    [referenceImagePts[m.queryIdx].pt for m in good_matches]
                 ).reshape(-1, 1, 2)
                 destinationPoints = np.float32(
-                    [sourceImagePts[m.trainIdx].pt for m in matches]
+                    [sourceImagePts[m.trainIdx].pt for m in good_matches]
                 ).reshape(-1, 1, 2)
 
                 # Obtain the homography matrix
