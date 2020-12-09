@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from object_loader import *
 from collections import deque
 
+global capture,  ret, matrix, distortion, r_vecs, t_vecs
 
 class CameraCapture:
     def __init__(self, name, res=(320, 240)):
@@ -51,7 +52,6 @@ class CameraCapture:
     def release(self):
         self.capture.release()
 
-
 def cameraCalibration(capture):
     checkerBoardSize = (6, 6)
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -88,6 +88,7 @@ def cameraCalibration(capture):
             points3D, points2D, grayImage.shape[::-1], None, None)
     else:
         return False, None, None, None, None
+
 
 
 def projection_matrix(camera_parameters, homography):
@@ -151,11 +152,36 @@ def render(frame, obj, projection, referenceImage, scale3d, color=False):
 # https://bitesofcode.wordpress.com/2017/09/12/augmented-reality-with-python-and-opencv-part-1/
 # https://bitesofcode.wordpress.com/2018/09/16/augmented-reality-with-python-and-opencv-part-2/
 
+def menu():
+    global capture, ret, matrix, distortion, r_vecs, t_vecs
 
-def main():
     capture = CameraCapture(0)
-    status = "calibrating"
-    ret, matrix, distortion, r_vecs, t_vecs = cameraCalibration(capture)
+
+    ans=True
+    while ans:
+        print ("""
+        1.Preparation Program
+        2.Augmentation Program Normal Mode
+        3.Augmentation Program Tutorial Mode
+        4.Exit
+        """)
+        ans=input("What would you like to do?")
+
+        if ans=="1":
+            ret, matrix, distortion, r_vecs, t_vecs = cameraCalibration(capture)
+        elif ans=="2":
+            augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, False)
+        elif ans=="3":
+            augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, True)
+        elif ans=="4":
+            exit()
+
+        elif ans !="":
+            print("\n Not Valid Choice Try again") 
+
+
+   
+def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
     if ret:
 
         # ============== Read data ==============
@@ -210,6 +236,7 @@ def main():
                 if m.distance < ratio_thresh*n.distance:
                     good_matches.append(m)
 
+            
             # ============== Homography =============
             # Apply the homography transformation if we have enough good matches
             if len(good_matches) > MIN_MATCHES:
@@ -226,6 +253,7 @@ def main():
                     sourcePoints, destinationPoints, cv.RANSAC, 5.0
                 )
 
+                
                 # Apply the perspective transformation to the source image corners
                 h, w = referenceImage.shape
                 corners = np.float32(
@@ -236,24 +264,22 @@ def main():
                         corners, homography)
                 except:
                     continue
-
-                matchesMask = [[0,0] for i in range(len(matches))]
-
-                # ratio test as per Lowe's paper
-                for i,(m,n) in enumerate(matches):
-                    if m.distance < 0.7*n.distance:
-                        matchesMask[i]=[1,0]
                 
-                draw_params = dict(matchColor = (0,255,0),
-                   singlePointColor = (255,0,0),
-                   matchesMask = matchesMask,
-                   flags = cv.DrawMatchesFlags_DEFAULT)
+                if(tutorial):
+                    matchesMask = [[0,0] for i in range(len(matches))]
 
-                img3 = cv.drawMatchesKnn(
+                    for i,(m,n) in enumerate(matches):
+                        if m.distance < 0.7*n.distance:
+                            matchesMask[i]=[1,0]
+                
+                    draw_params = dict(matchColor = (0,255,0),
+                        singlePointColor = (255,0,0),
+                        matchesMask = matchesMask,
+                        flags = cv.DrawMatchesFlags_DEFAULT)
+
+                    img3 = cv.drawMatchesKnn(
                         referenceImage, referenceImagePts, frame, sourceImagePts, matches, None, **draw_params)
-                plt.imshow(img3,), plt.show()
-
-
+                    plt.imshow(img3,), plt.show()
 
                 # Draw a polygon on the second image joining the transformed corners
                 frame = cv.polylines(
@@ -283,6 +309,8 @@ def main():
     cv.destroyAllWindows()
     return 0
 
-
+def main():
+    menu()
+    
 if __name__ == "__main__":
     main()
