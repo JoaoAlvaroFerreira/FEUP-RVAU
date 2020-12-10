@@ -11,7 +11,7 @@ from collections import deque
 global capture,  ret, matrix, distortion, r_vecs, t_vecs
 
 class CameraCapture:
-    def __init__(self, name, res=(320, 240)):
+    def __init__(self, name, res=(640, 820)):
         self.capture = cv.VideoCapture(name, cv.CAP_DSHOW)
         self.capture.set(3, res[0])
         self.capture.set(4, res[1])
@@ -53,8 +53,9 @@ class CameraCapture:
         self.capture.release()
 
 def cameraCalibration(capture):
-    checkerBoardSize = (6, 6)
-    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    # Adjust this according to what calibration pattern you are using!
+    checkerBoardSize = (7, 9)
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 20, 0.001)
     points3D = []
     points2D = []
 
@@ -169,6 +170,7 @@ def menu():
 
         if ans=="1":
             ret, matrix, distortion, r_vecs, t_vecs = cameraCalibration(capture)
+            print(matrix)
         elif ans=="2":
             augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, False)
         elif ans=="3":
@@ -180,6 +182,68 @@ def menu():
             print("\n Not Valid Choice Try again") 
 
 
+
+def found_marker(frame, sourceImagePts, referenceImage, referenceImagePts, matches, good_matches, obj, tutorial):
+    scale3d = 1
+
+    # Get the good key points positions
+    sourcePoints = np.float32(
+        [referenceImagePts[m.queryIdx].pt for m in good_matches]
+    ).reshape(-1, 1, 2)
+    destinationPoints = np.float32(
+        [sourceImagePts[m.trainIdx].pt for m in good_matches]
+    ).reshape(-1, 1, 2)
+
+    # Obtain the homography matrix
+    homography, _ = cv.findHomography(
+        sourcePoints, destinationPoints, cv.RANSAC, 5.0
+    )
+
+    # Apply the perspective transformation to the source image corners
+    h, w = referenceImage.shape
+    corners = np.float32(
+        [[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]
+    ).reshape(-1, 1, 2)
+    try:
+        transformedCorners = cv.perspectiveTransform(
+            corners, homography)
+    except:
+        return
+
+    if(tutorial):
+        matchesMask = [[0,0] for i in range(len(matches))]
+
+        for i,(m,n) in enumerate(matches):
+            if m.distance < 0.7*n.distance:
+                matchesMask[i]=[1,0]
+
+        draw_params = dict(matchColor = (0,255,0),
+            singlePointColor = (255,0,0),
+            matchesMask = matchesMask,
+            flags = cv.DrawMatchesFlags_DEFAULT)
+
+        img3 = cv.drawMatchesKnn(
+            referenceImage, referenceImagePts, frame, sourceImagePts, matches, None, **draw_params)
+        plt.imshow(img3,), plt.show()
+
+    # Draw a polygon on the second image joining the transformed corners
+
+    # ================= Pose Estimation ================
+
+    # obtain 3D projection matrix from homography matrix and camera parameters
+    projection = projection_matrix(matrix, homography)
+
+    # project cube or model
+    frame = render(frame, obj, projection,
+                    referenceImage, scale3d, False)
+
+    # Draw a polygon on the second image joining the transformed corners
+    frame = cv.polylines(
+        frame, [np.int32(transformedCorners)
+                ], True, (255, 0, 0), 3, cv.LINE_AA,
+    )
+
+
    
 def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
     if ret:
@@ -187,21 +251,25 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
         # ============== Read data ==============
 
         # Load 3D model from OBJ file
-        obj = OBJ("./fox.obj", swapyz=True)
+        obj_fox = OBJ("./fox.obj", swapyz=True)
+        obj_star = OBJ("./Star_01.obj", swapyz=True)
 
-        referenceImage = cv.imread("./image.jpg", 0)
+
+        referenceImage = cv.imread("./starwars_poster.jpg", 0)
+        referenceImage2 = cv.imread("./endgame_poster.jpg", 0)
+
 
         # Scale 3D model
         scale3d = 1
 
         sift = cv.SIFT_create()
 
-        # brute force matcher
-        bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
-
         # Compute model keypoints and its descriptors
         referenceImagePts, referenceImageDsc = sift.detectAndCompute(
             referenceImage, None)
+        referenceImagePts2, referenceImageDsc2 = sift.detectAndCompute(
+            referenceImage2, None)
+        
 
         # FLANN parameters
         FLANN_INDEX_KDTREE = 1
@@ -211,6 +279,7 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
         flann = cv.FlannBasedMatcher(index_params, search_params)
 
         MIN_MATCHES = len(referenceImagePts) / 30
+        MIN_MATCHES2 = len(referenceImagePts2) / 30
 
         while True:
             frame = capture.read()
@@ -219,6 +288,8 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
 
             # Compute scene keypoints and its descriptors
             sourceImagePts, sourceImageDsc = sift.detectAndCompute(frame, None)
+            sourceImagePts2, sourceImageDsc2 = sift.detectAndCompute(frame, None)
+
 
             # ============== Matching =============
 
@@ -226,77 +297,29 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
             try:
                 matches = flann.knnMatch(
                     referenceImageDsc, sourceImageDsc, k=2)
+                matches2 = flann.knnMatch(
+                    referenceImageDsc2, sourceImageDsc2, k=2)
             except:
                 continue
 
             # -- Filter matches using the Lowe's ratio test
             ratio_thresh = 0.7
             good_matches = []
+            good_matches2 = []
+
             for m, n in matches:
                 if m.distance < ratio_thresh*n.distance:
                     good_matches.append(m)
+            for m, n in matches2:
+                if m.distance < ratio_thresh*n.distance:
+                    good_matches2.append(m)
 
-            
             # ============== Homography =============
             # Apply the homography transformation if we have enough good matches
             if len(good_matches) > MIN_MATCHES:
-                # Get the good key points positions
-                sourcePoints = np.float32(
-                    [referenceImagePts[m.queryIdx].pt for m in good_matches]
-                ).reshape(-1, 1, 2)
-                destinationPoints = np.float32(
-                    [sourceImagePts[m.trainIdx].pt for m in good_matches]
-                ).reshape(-1, 1, 2)
-
-                # Obtain the homography matrix
-                homography, _ = cv.findHomography(
-                    sourcePoints, destinationPoints, cv.RANSAC, 5.0
-                )
-
-                
-                # Apply the perspective transformation to the source image corners
-                h, w = referenceImage.shape
-                corners = np.float32(
-                    [[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]
-                ).reshape(-1, 1, 2)
-                try:
-                    transformedCorners = cv.perspectiveTransform(
-                        corners, homography)
-                except:
-                    continue
-                
-                if(tutorial):
-                    matchesMask = [[0,0] for i in range(len(matches))]
-
-                    for i,(m,n) in enumerate(matches):
-                        if m.distance < 0.7*n.distance:
-                            matchesMask[i]=[1,0]
-                
-                    draw_params = dict(matchColor = (0,255,0),
-                        singlePointColor = (255,0,0),
-                        matchesMask = matchesMask,
-                        flags = cv.DrawMatchesFlags_DEFAULT)
-
-                    img3 = cv.drawMatchesKnn(
-                        referenceImage, referenceImagePts, frame, sourceImagePts, matches, None, **draw_params)
-                    plt.imshow(img3,), plt.show()
-
-                # Draw a polygon on the second image joining the transformed corners
-                frame = cv.polylines(
-                    frame, [np.int32(transformedCorners)
-                            ], True, 255, 3, cv.LINE_AA,
-                )
-
-                # ================= Pose Estimation ================
-
-                # obtain 3D projection matrix from homography matrix and camera parameters
-                projection = projection_matrix(matrix, homography)
-
-                # project cube or model
-                frame = render(frame, obj, projection,
-                               referenceImage, scale3d, False)
-
-                # ===================== Display ====================
+                found_marker(frame, sourceImagePts, referenceImage, referenceImagePts, matches, good_matches, obj_fox, False)  
+            elif len(good_matches2) > MIN_MATCHES2:
+                found_marker(frame, sourceImagePts2, referenceImage2, referenceImagePts2, matches2, good_matches2, obj_star, False)                
 
             # show result
             cv.imshow("frame", frame)
