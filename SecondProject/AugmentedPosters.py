@@ -182,9 +182,8 @@ def menu():
             print("\n Not Valid Choice Try again") 
 
 
-
-def found_marker(frame, sourceImagePts, referenceImage, referenceImagePts, matches, good_matches, obj, tutorial):
-    scale3d = 1
+def found_marker(frame, sourceImagePts, referenceImage, referenceImagePts, matches, good_matches, obj, text, tutorial):
+    scale3d = 80
 
     # Get the good key points positions
     sourcePoints = np.float32(
@@ -236,27 +235,35 @@ def found_marker(frame, sourceImagePts, referenceImage, referenceImagePts, match
     # project cube or model
     frame = render(frame, obj, projection,
                     referenceImage, scale3d, False)
+    
+    # TODO move text to be on image
+    cv.putText(frame, text, (0,200), cv.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv.LINE_AA)
 
     # Draw a polygon on the second image joining the transformed corners
     frame = cv.polylines(
         frame, [np.int32(transformedCorners)
                 ], True, (255, 0, 0), 3, cv.LINE_AA,
     )
+    
 
 
-   
 def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
     if ret:
 
         # ============== Read data ==============
 
         # Load 3D model from OBJ file
-        obj_fox = OBJ("./fox.obj", swapyz=True)
-        obj_star = OBJ("./Star_01.obj", swapyz=True)
+        fox_obj = OBJ("./fox.obj", swapyz=True)
+
+        one_cube_obj = OBJ("./one_cube.obj", swapyz=True)
+        two_cubes_obj = OBJ("./two_cubes.obj", swapyz=True)
+        three_cubes_obj = OBJ("./three_cubes.obj", swapyz=True)
+        four_cubes_obj = OBJ("./four_cubes.obj", swapyz=True)
+        five_cubes_obj = OBJ("./five_cubes.obj", swapyz=True)
 
 
-        referenceImage = cv.imread("./starwars_poster.jpg", 0)
-        referenceImage2 = cv.imread("./endgame_poster.jpg", 0)
+        starwars_image = cv.imread("./starwars_poster.jpg", 0)
+        avengers_image = cv.imread("./endgame_poster.jpg", 0)
 
 
         # Scale 3D model
@@ -265,10 +272,10 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
         sift = cv.SIFT_create()
 
         # Compute model keypoints and its descriptors
-        referenceImagePts, referenceImageDsc = sift.detectAndCompute(
-            referenceImage, None)
-        referenceImagePts2, referenceImageDsc2 = sift.detectAndCompute(
-            referenceImage2, None)
+        starwarsImagePts, referenceImageDsc = sift.detectAndCompute(
+            starwars_image, None)
+        avengersImagePts, referenceImageDsc2 = sift.detectAndCompute(
+            avengers_image, None)
         
 
         # FLANN parameters
@@ -278,8 +285,8 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
         search_params = dict(checks=50)   # or pass empty dictionary
         flann = cv.FlannBasedMatcher(index_params, search_params)
 
-        MIN_MATCHES = len(referenceImagePts) / 30
-        MIN_MATCHES2 = len(referenceImagePts2) / 30
+        MIN_MATCHES = len(starwarsImagePts) / 30
+        MIN_MATCHES2 = len(avengersImagePts) / 30
 
         while True:
             frame = capture.read()
@@ -287,39 +294,39 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
             # ============== Recognize =============
 
             # Compute scene keypoints and its descriptors
-            sourceImagePts, sourceImageDsc = sift.detectAndCompute(frame, None)
-            sourceImagePts2, sourceImageDsc2 = sift.detectAndCompute(frame, None)
+            starwarsSourceImagePts, starwarsSourceImageDsc = sift.detectAndCompute(frame, None)
+            avengersSourceImagePts, avengersSourceImageDsc = sift.detectAndCompute(frame, None)
 
 
             # ============== Matching =============
 
             # Match frame descriptors with model descriptors
             try:
-                matches = flann.knnMatch(
-                    referenceImageDsc, sourceImageDsc, k=2)
-                matches2 = flann.knnMatch(
-                    referenceImageDsc2, sourceImageDsc2, k=2)
+                starwarsMatches = flann.knnMatch(
+                    referenceImageDsc, starwarsSourceImageDsc, k=2)
+                avengersMatches = flann.knnMatch(
+                    referenceImageDsc2, avengersSourceImageDsc, k=2)
             except:
                 continue
 
             # -- Filter matches using the Lowe's ratio test
             ratio_thresh = 0.7
-            good_matches = []
-            good_matches2 = []
+            starwars_good_matches = []
+            avengers_good_matches = []
 
-            for m, n in matches:
+            for m, n in starwarsMatches:
                 if m.distance < ratio_thresh*n.distance:
-                    good_matches.append(m)
-            for m, n in matches2:
+                    starwars_good_matches.append(m)
+            for m, n in avengersMatches:
                 if m.distance < ratio_thresh*n.distance:
-                    good_matches2.append(m)
+                    avengers_good_matches.append(m)
 
             # ============== Homography =============
             # Apply the homography transformation if we have enough good matches
-            if len(good_matches) > MIN_MATCHES:
-                found_marker(frame, sourceImagePts, referenceImage, referenceImagePts, matches, good_matches, obj_fox, False)  
-            elif len(good_matches2) > MIN_MATCHES2:
-                found_marker(frame, sourceImagePts2, referenceImage2, referenceImagePts2, matches2, good_matches2, obj_star, False)                
+            if len(starwars_good_matches) > MIN_MATCHES:
+                found_marker(frame, starwarsSourceImagePts, starwars_image, starwarsImagePts, starwars_good_matches, starwars_good_matches, two_cubes_obj, "Star wars TLY movie", False)  
+            elif len(avengers_good_matches) > MIN_MATCHES2:
+                found_marker(frame, avengersSourceImagePts, avengers_image, avengersImagePts, avengers_good_matches, avengers_good_matches, five_cubes_obj, "Avengers Endgame movie", False)                
 
             # show result
             cv.imshow("frame", frame)
