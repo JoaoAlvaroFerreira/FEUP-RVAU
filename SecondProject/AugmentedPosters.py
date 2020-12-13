@@ -70,7 +70,11 @@ def cameraCalibration(capture):
         grayImage = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ret, corners = cv.findChessboardCorners(
             grayImage, checkerBoardSize, cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_FAST_CHECK + cv.CALIB_CB_NORMALIZE_IMAGE)
-        if ret == True:
+       
+        
+
+        if ret and cv.waitKey(33) == 97:
+            print("picture taken")
             points3D.append(objectp3d)
             # https://docs.opencv.org/master/dd/d92/tutorial_corner_subpixels.html
             corners2 = cv.cornerSubPix(
