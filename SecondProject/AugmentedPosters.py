@@ -447,7 +447,6 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         # ============== Recognize =============
 
         # Compute scene keypoints and its descriptors
-        # Compute scene keypoints and its descriptors
         sourceImagePts, sourceImageDsc = sift.detectAndCompute(
             frame, None)
 
