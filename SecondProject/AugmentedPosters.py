@@ -448,11 +448,7 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
 
         # Compute scene keypoints and its descriptors
         # Compute scene keypoints and its descriptors
-        starwarsSourceImagePts, starwarsSourceImageDsc = sift.detectAndCompute(
-            frame, None)
-        avengersSourceImagePts, avengersSourceImageDsc = sift.detectAndCompute(
-            frame, None)
-        batmanSourceImagePts, batmanSourceImageDsc = sift.detectAndCompute(
+        sourceImagePts, sourceImageDsc = sift.detectAndCompute(
             frame, None)
 
         # ============== Matching =============
@@ -460,11 +456,11 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         # Match frame descriptors with model descriptors
         try:
             starwarsMatches = flann.knnMatch(
-                referenceImageDsc, starwarsSourceImageDsc, k=2)
+                referenceImageDsc, sourceImageDsc, k=2)
             avengersMatches = flann.knnMatch(
-                referenceImageDsc2, avengersSourceImageDsc, k=2)
+                referenceImageDsc2, sourceImageDsc, k=2)
             batmanMatches = flann.knnMatch(
-                referenceImageDsc4, batmanSourceImageDsc, k=2)
+                referenceImageDsc4, sourceImageDsc, k=2)
         except:
             continue
 
@@ -487,13 +483,13 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         # ============== Homography =============
         # Apply the homography transformation if we have enough good matches
         if len(starwars_good_matches) > MIN_MATCHES:
-            found_marker(newCameraMtx, frame, starwarsSourceImagePts, starwars_image, starwarsImagePts,
+            found_marker(newCameraMtx, frame, sourceImagePts, starwars_image, starwarsImagePts,
                          starwarsMatches, starwars_good_matches, one_cube_obj, starwars_text_obj, tutorial)
         if len(avengers_good_matches) > MIN_MATCHES2:
-            found_marker(newCameraMtx, frame, avengersSourceImagePts, avengers_image, avengersImagePts,
+            found_marker(newCameraMtx, frame, sourceImagePts, avengers_image, avengersImagePts,
                          avengersMatches, avengers_good_matches, two_cubes_obj, avengers_text_obj, tutorial)
         if len(batman_good_matches) > MIN_MATCHES4:
-            found_marker(newCameraMtx, frame, batmanSourceImagePts, batman_image, batmanImagePts,
+            found_marker(newCameraMtx, frame, sourceImagePts, batman_image, batmanImagePts,
                          batmanMatches, batman_good_matches, three_cubes_obj, batman_text_obj, tutorial)
 
         # show result
