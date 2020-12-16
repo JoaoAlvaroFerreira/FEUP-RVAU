@@ -401,7 +401,7 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
 
     one_cube_obj = OBJ("./cubes/one_cube.obj", swapyz=True)
     two_cubes_obj = OBJ("./cubes/two_cubes.obj", swapyz=True)
-    three_cubes_obj = OBJ("./cubes/three_cubes.obj", swapyz=True)
+    three_cubes_obj = OBJ("./cubes/new_three.obj", swapyz=True)
     four_cubes_obj = OBJ("./cubes/four_cubes.obj", swapyz=True)
     five_cubes_obj = OBJ("./cubes/five_cubes.obj", swapyz=True)
 
@@ -436,7 +436,6 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
 
     # FLANN parameters
     FLANN_INDEX_KDTREE = 1
-    # TODO change this values or try explore dictionaries
     index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
     search_params = dict(checks=50)   # or pass empty dictionary
     flann = cv.FlannBasedMatcher(index_params, search_params)
@@ -463,11 +462,7 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
             frame, None)
         avengersSourceImagePts, avengersSourceImageDsc = sift.detectAndCompute(
             frame, None)
-        scarfaceSourceImagePts, scarfaceSourceImageDsc = sift.detectAndCompute(
-            frame, None)
         batmanSourceImagePts, batmanSourceImageDsc = sift.detectAndCompute(
-            frame, None)
-        matrixSourceImagePts, matrixSourceImageDsc = sift.detectAndCompute(
             frame, None)
 
         # ============== Matching =============
@@ -478,12 +473,8 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
                 referenceImageDsc, starwarsSourceImageDsc, k=2)
             avengersMatches = flann.knnMatch(
                 referenceImageDsc2, avengersSourceImageDsc, k=2)
-            scarfaceMatches = flann.knnMatch(
-                referenceImageDsc3, scarfaceSourceImageDsc, k=2)
             batmanMatches = flann.knnMatch(
                 referenceImageDsc4, batmanSourceImageDsc, k=2)
-            matrixMatches = flann.knnMatch(
-                referenceImageDsc5, matrixSourceImageDsc, k=2)
         except:
             continue
 
@@ -491,9 +482,7 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         ratio_thresh = 0.7
         starwars_good_matches = []
         avengers_good_matches = []
-        scarface_good_matches = []
         batman_good_matches = []
-        matrix_good_matches = []
 
         for m, n in starwarsMatches:
             if m.distance < ratio_thresh*n.distance:
@@ -501,33 +490,21 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         for m, n in avengersMatches:
             if m.distance < ratio_thresh*n.distance:
                 avengers_good_matches.append(m)
-        for m, n in scarfaceMatches:
-            if m.distance < ratio_thresh*n.distance:
-                scarface_good_matches.append(m)
         for m, n in batmanMatches:
             if m.distance < ratio_thresh*n.distance:
                 batman_good_matches.append(m)
-        for m, n in matrixMatches:
-            if m.distance < ratio_thresh*n.distance:
-                matrix_good_matches.append(m)
 
         # ============== Homography =============
         # Apply the homography transformation if we have enough good matches
         if len(starwars_good_matches) > MIN_MATCHES:
             found_marker(newCameraMtx, frame, starwarsSourceImagePts, starwars_image, starwarsImagePts,
                          starwarsMatches, starwars_good_matches, one_cube_obj, starwars_text_obj, tutorial)
-        elif len(avengers_good_matches) > MIN_MATCHES2:
+        if len(avengers_good_matches) > MIN_MATCHES2:
             found_marker(newCameraMtx, frame, avengersSourceImagePts, avengers_image, avengersImagePts,
                          avengersMatches, avengers_good_matches, two_cubes_obj, avengers_text_obj, tutorial)
-        elif len(scarface_good_matches) > MIN_MATCHES3:
-            found_marker(newCameraMtx, frame, scarfaceSourceImagePts, scarface_image, scarfaceImagePts,
-                         scarfaceMatches, scarface_good_matches, three_cubes_obj, scarface_text_obj, tutorial)
-        elif len(batman_good_matches) > MIN_MATCHES4:
+        if len(batman_good_matches) > MIN_MATCHES4:
             found_marker(newCameraMtx, frame, batmanSourceImagePts, batman_image, batmanImagePts,
                          batmanMatches, batman_good_matches, three_cubes_obj, batman_text_obj, tutorial)
-        elif len(matrix_good_matches) > MIN_MATCHES5:
-            found_marker(newCameraMtx, frame, matrixSourceImagePts, matrix_image, matrixImagePts,
-                         matrixMatches, matrix_good_matches, five_cubes_obj, matrix_text_obj, tutorial)
 
         # show result
         cv.imshow("frame", frame)
