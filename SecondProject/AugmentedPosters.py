@@ -407,15 +407,11 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
 
     starwars_image = cv.imread("./images/starwars_poster.jpg", 0)
     avengers_image = cv.imread("./images/endgame_poster.jpg", 0)
-    scarface_image = cv.imread("./images/scarface_poster.jpg", 0)
     batman_image = cv.imread("./images/batman_poster.jpg", 0)
-    matrix_image = cv.imread("./images/matrix_poster.jpg", 0)
 
     starwars_text_obj = OBJ("./text/starwars_text.obj", swapyz=True)
     avengers_text_obj = OBJ("./text/avengers_text.obj", swapyz=True)
-    scarface_text_obj = OBJ("./text/scarface_text.obj", swapyz=True)
     batman_text_obj = OBJ("./text/batman_text.obj", swapyz=True)
-    matrix_text_obj = OBJ("./text/matrix_text.obj", swapyz=True)
 
     # Scale 3D model
     scale3d = 1
@@ -427,12 +423,8 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         starwars_image, None)
     avengersImagePts, referenceImageDsc2 = sift.detectAndCompute(
         avengers_image, None)
-    scarfaceImagePts, referenceImageDsc3 = sift.detectAndCompute(
-        scarface_image, None)
     batmanImagePts, referenceImageDsc4 = sift.detectAndCompute(
         batman_image, None)
-    matrixImagePts, referenceImageDsc5 = sift.detectAndCompute(
-        matrix_image, None)
 
     # FLANN parameters
     FLANN_INDEX_KDTREE = 1
@@ -442,9 +434,7 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
 
     MIN_MATCHES = len(starwarsImagePts) / 30
     MIN_MATCHES2 = len(avengersImagePts) / 30
-    MIN_MATCHES3 = len(scarfaceImagePts) / 30
     MIN_MATCHES4 = len(batmanImagePts) / 30
-    MIN_MATCHES5 = len(matrixImagePts) / 30
 
     # https://docs.opencv.org/master/dc/dbb/tutorial_py_calibration.html
     x, y, w, h = roi
