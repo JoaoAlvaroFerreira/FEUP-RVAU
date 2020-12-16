@@ -385,31 +385,25 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
     four_cubes_obj = OBJ("./four_cubes.obj", swapyz=True)
     five_cubes_obj = OBJ("./five_cubes.obj", swapyz=True)
 
-        starwars_image = cv.imread("./starwars_poster.jpg", 0)
-        avengers_image = cv.imread("./endgame_poster.jpg", 0)
-        scarface_image = cv.imread("./scarface_poster.jpg", 0)
-        batman_image = cv.imread("./batman_poster.jpg", 0)
+    starwars_image = cv.imread("./starwars_poster.jpg", 0)
+    avengers_image = cv.imread("./endgame_poster.jpg", 0)
+    scarface_image = cv.imread("./scarface_poster.jpg", 0)
+    batman_image = cv.imread("./batman_poster.jpg", 0)
 
     # Scale 3D model
     scale3d = 1
 
     sift = cv.SIFT_create()
 
-    # Compute model keypoints and its descriptors
+        # Compute model keypoints and its descriptors
     starwarsImagePts, referenceImageDsc = sift.detectAndCompute(
         starwars_image, None)
     avengersImagePts, referenceImageDsc2 = sift.detectAndCompute(
         avengers_image, None)
-
-        # Compute model keypoints and its descriptors
-        starwarsImagePts, referenceImageDsc = sift.detectAndCompute(
-            starwars_image, None)
-        avengersImagePts, referenceImageDsc2 = sift.detectAndCompute(
-            avengers_image, None)
-        scarfaceImagePts, referenceImageDsc3 = sift.detectAndCompute(
-            scarface_image, None)
-        batmanImagePts, referenceImageDsc4 = sift.detectAndCompute(
-            batman_image, None)
+    scarfaceImagePts, referenceImageDsc3 = sift.detectAndCompute(
+        scarface_image, None)
+    batmanImagePts, referenceImageDsc4 = sift.detectAndCompute(
+        batman_image, None)
         
     # FLANN parameters
     FLANN_INDEX_KDTREE = 1
@@ -418,6 +412,11 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
     search_params = dict(checks=50)   # or pass empty dictionary
     flann = cv.FlannBasedMatcher(index_params, search_params)
 
+    
+    MIN_MATCHES = len(starwarsImagePts) / 30
+    MIN_MATCHES2 = len(avengersImagePts) / 30
+    MIN_MATCHES3 = len(scarfaceImagePts) / 30
+    MIN_MATCHES4 = len(batmanImagePts) / 30
     # https://docs.opencv.org/master/dc/dbb/tutorial_py_calibration.html
     x, y, w, h = roi
 
