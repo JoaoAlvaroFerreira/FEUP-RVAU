@@ -141,13 +141,13 @@ def projection_matrix(camera_parameters, homography):
     return np.dot(camera_parameters, projection)
 
 
-def render(frame, obj, projection, referenceImage, scale3d, color=False):
+def render(frame, obj, projection, h, w, scale3d, color):
     """
     Render a loaded obj model into the current video frame
     """
     vertices = obj.vertices
     scale_matrix = np.eye(3) * scale3d
-    h, w = referenceImage.shape
+    #h, w = referenceImage.shape
 
     for face in obj.faces:
         face_vertices = face[0]
@@ -156,11 +156,11 @@ def render(frame, obj, projection, referenceImage, scale3d, color=False):
 
         # render model in the middle of the reference surface. To do so,
         # model points must be displaced
-        points = np.array([[p[0] + w / 2, p[1] + h / 2, p[2]] for p in points])
+        points = np.array([[p[0] + w, p[1] + h, p[2]] for p in points])
         dst = cv.perspectiveTransform(points.reshape(-1, 1, 3), projection)
         framePts = np.int32(dst)
 
-        cv.fillConvexPoly(frame, framePts, (137, 27, 211))
+        cv.fillConvexPoly(frame, framePts, color)
 
     return frame
 
@@ -308,7 +308,7 @@ def menu():
                     print("\n Not Valid Choice Try again")
 
 
-def found_marker(newCameraMtx, frame, sourceImagePts, referenceImage, referenceImagePts, matches, good_matches, obj, text, tutorial):
+def found_marker(newCameraMtx, frame, sourceImagePts, referenceImage, referenceImagePts, matches, good_matches, cube_obj, text_obj, tutorial):
     scale3d = 80
 
     # Get the good key points positions
@@ -358,13 +358,14 @@ def found_marker(newCameraMtx, frame, sourceImagePts, referenceImage, referenceI
     # obtain 3D projection matrix from homography matrix and camera parameters
     projection = projection_matrix(newCameraMtx, homography)
 
-    # project cube or model
-    frame = render(frame, obj, projection,
-                   referenceImage, scale3d, False)
 
-    # TODO move text to be on image
-    cv.putText(frame, text, (0, 200), cv.FONT_HERSHEY_SIMPLEX,
-               2, (0, 0, 255), 3, cv.LINE_AA)
+    # project text object (green)
+    frame = render(frame, text_obj, projection,
+                100, 50, scale3d, (0, 255, 0))
+
+    # project cube object (pink)
+    frame = render(frame, cube_obj, projection,
+                   referenceImage.shape[0] / 2, referenceImage.shape[1] / 2, scale3d, (137, 27, 211))
 
     # Draw a polygon on the second image joining the transformed corners
     frame = cv.polylines(
@@ -387,6 +388,8 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
 
     starwars_image = cv.imread("./starwars_poster.jpg", 0)
     avengers_image = cv.imread("./endgame_poster.jpg", 0)
+
+    avengers_text_obj = OBJ("./avengers_text.obj", swapyz=True)
 
     # Scale 3D model
     scale3d = 1
@@ -451,10 +454,10 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         # Apply the homography transformation if we have enough good matches
         if len(starwars_good_matches) > MIN_MATCHES:
             found_marker(newCameraMtx, frame, starwarsSourceImagePts, starwars_image, starwarsImagePts,
-                         starwarsMatches, starwars_good_matches, two_cubes_obj, "Star wars TLY movie", tutorial)
+                         starwarsMatches, starwars_good_matches, two_cubes_obj, avengers_text_obj, tutorial)
         elif len(avengers_good_matches) > MIN_MATCHES2:
             found_marker(newCameraMtx, frame, avengersSourceImagePts, avengers_image, avengersImagePts,
-                         avengersMatches, avengers_good_matches, five_cubes_obj, "Avengers Endgame movie", tutorial)
+                         avengersMatches, avengers_good_matches, five_cubes_obj, avengers_text_obj, tutorial)
 
         # show result
         cv.imshow("frame", frame)
