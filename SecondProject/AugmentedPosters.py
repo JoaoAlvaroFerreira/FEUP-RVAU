@@ -388,20 +388,32 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
 
     starwars_image = cv.imread("./starwars_poster.jpg", 0)
     avengers_image = cv.imread("./endgame_poster.jpg", 0)
+    scarface_image = cv.imread("./scarface_poster.jpg", 0)
+    batman_image = cv.imread("./batman_poster.jpg", 0)
+    matrix_image = cv.imread("./matrix_poster.jpg", 0)
+    
 
+    starwars_text_obj = OBJ("./starwars_text.obj", swapyz=True)
     avengers_text_obj = OBJ("./avengers_text.obj", swapyz=True)
+    scarface_text_obj = OBJ("./scarface_text.obj", swapyz=True)
+    batman_text_obj = OBJ("./batman_text.obj", swapyz=True)
+    matrix_text_obj = OBJ("./matrix_text.obj", swapyz=True)
 
     # Scale 3D model
     scale3d = 1
 
     sift = cv.SIFT_create()
 
-    # Compute model keypoints and its descriptors
+        # Compute model keypoints and its descriptors
     starwarsImagePts, referenceImageDsc = sift.detectAndCompute(
         starwars_image, None)
     avengersImagePts, referenceImageDsc2 = sift.detectAndCompute(
         avengers_image, None)
-
+    scarfaceImagePts, referenceImageDsc3 = sift.detectAndCompute(
+        scarface_image, None)
+    batmanImagePts, referenceImageDsc4 = sift.detectAndCompute(
+        batman_image, None)
+        
     # FLANN parameters
     FLANN_INDEX_KDTREE = 1
     # TODO change this values or try explore dictionaries
@@ -409,8 +421,11 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
     search_params = dict(checks=50)   # or pass empty dictionary
     flann = cv.FlannBasedMatcher(index_params, search_params)
 
+    
     MIN_MATCHES = len(starwarsImagePts) / 30
     MIN_MATCHES2 = len(avengersImagePts) / 30
+    MIN_MATCHES3 = len(scarfaceImagePts) / 30
+    MIN_MATCHES4 = len(batmanImagePts) / 30
     # https://docs.opencv.org/master/dc/dbb/tutorial_py_calibration.html
     x, y, w, h = roi
 
@@ -422,10 +437,11 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         # ============== Recognize =============
 
         # Compute scene keypoints and its descriptors
-        starwarsSourceImagePts, starwarsSourceImageDsc = sift.detectAndCompute(
-            frame, None)
-        avengersSourceImagePts, avengersSourceImageDsc = sift.detectAndCompute(
-            frame, None)
+           # Compute scene keypoints and its descriptors
+        starwarsSourceImagePts, starwarsSourceImageDsc = sift.detectAndCompute(frame, None)
+        avengersSourceImagePts, avengersSourceImageDsc = sift.detectAndCompute(frame, None)
+        scarfaceSourceImagePts, scarfaceSourceImageDsc = sift.detectAndCompute(frame, None)
+        batmanSourceImagePts, batmanSourceImageDsc = sift.detectAndCompute(frame, None)
 
         # ============== Matching =============
 
@@ -435,6 +451,10 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
                 referenceImageDsc, starwarsSourceImageDsc, k=2)
             avengersMatches = flann.knnMatch(
                 referenceImageDsc2, avengersSourceImageDsc, k=2)
+            scarfaceMatches = flann.knnMatch(
+                referenceImageDsc3, scarfaceSourceImageDsc, k=2)
+            batmanMatches = flann.knnMatch(
+                referenceImageDsc4, batmanSourceImageDsc, k=2)
         except:
             continue
 
@@ -442,6 +462,8 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         ratio_thresh = 0.7
         starwars_good_matches = []
         avengers_good_matches = []
+        scarface_good_matches = []
+        batman_good_matches = []
 
         for m, n in starwarsMatches:
             if m.distance < ratio_thresh*n.distance:
@@ -449,6 +471,13 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         for m, n in avengersMatches:
             if m.distance < ratio_thresh*n.distance:
                 avengers_good_matches.append(m)
+        for m, n in scarfaceMatches:
+            if m.distance < ratio_thresh*n.distance:
+                scarface_good_matches.append(m)
+        for m, n in batmanMatches:
+            if m.distance < ratio_thresh*n.distance:
+                batman_good_matches.append(m)
+
 
         # ============== Homography =============
         # Apply the homography transformation if we have enough good matches
@@ -458,6 +487,13 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         elif len(avengers_good_matches) > MIN_MATCHES2:
             found_marker(newCameraMtx, frame, avengersSourceImagePts, avengers_image, avengersImagePts,
                          avengersMatches, avengers_good_matches, five_cubes_obj, avengers_text_obj, tutorial)
+        elif len(scarface_good_matches) > MIN_MATCHES3:
+            found_marker(newCameraMtx, frame, scarfaceSourceImagePts, scarface_image, scarfaceImagePts, 
+                        scarfaceMatches, scarface_good_matches, three_cubes_obj, scarface_text_obj, tutorial)                
+        elif len(batman_good_matches) > MIN_MATCHES4:
+            found_marker(newCameraMtx, frame, batmanSourceImagePts, batman_image, batmanImagePts, 
+                        batmanMatches, batman_good_matches, five_cubes_obj, batman_text_obj, tutorial)     
+
 
         # show result
         cv.imshow("frame", frame)
