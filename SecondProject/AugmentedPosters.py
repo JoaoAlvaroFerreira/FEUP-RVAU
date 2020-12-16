@@ -403,7 +403,7 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
     two_cubes_obj = OBJ("./cubes/two_cubes.obj", swapyz=True)
     three_cubes_obj = OBJ("./cubes/new_three.obj", swapyz=True)
     four_cubes_obj = OBJ("./cubes/four_cubes.obj", swapyz=True)
-    five_cubes_obj = OBJ("./cubes/five_cubes.obj", swapyz=True)
+    five_cubes_obj = OBJ("./cubes/new_five.obj", swapyz=True)
 
     starwars_image = cv.imread("./images/starwars_poster.jpg", 0)
     avengers_image = cv.imread("./images/endgame_poster.jpg", 0)
