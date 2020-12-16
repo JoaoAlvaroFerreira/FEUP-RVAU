@@ -490,10 +490,10 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
                          starwarsMatches, starwars_good_matches, one_cube_obj, starwars_text_obj, tutorial)
         if len(avengers_good_matches) > MIN_MATCHES2:
             found_marker(newCameraMtx, frame, sourceImagePts, avengers_image, avengersImagePts,
-                         avengersMatches, avengers_good_matches, two_cubes_obj, avengers_text_obj, tutorial)
+                         avengersMatches, avengers_good_matches, three_cubes_obj, avengers_text_obj, tutorial)
         if len(batman_good_matches) > MIN_MATCHES4:
             found_marker(newCameraMtx, frame, sourceImagePts, batman_image, batmanImagePts,
-                         batmanMatches, batman_good_matches, three_cubes_obj, batman_text_obj, tutorial)
+                         batmanMatches, batman_good_matches, five_cubes_obj, batman_text_obj, tutorial)
 
         # show result
         cv.imshow("frame", frame)
