@@ -268,6 +268,8 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
 
         starwars_image = cv.imread("./starwars_poster.jpg", 0)
         avengers_image = cv.imread("./endgame_poster.jpg", 0)
+        scarface_image = cv.imread("./scarface_poster.jpg", 0)
+        batman_image = cv.imread("./batman_poster.jpg", 0)
 
 
         # Scale 3D model
@@ -280,6 +282,10 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
             starwars_image, None)
         avengersImagePts, referenceImageDsc2 = sift.detectAndCompute(
             avengers_image, None)
+        scarfaceImagePts, referenceImageDsc3 = sift.detectAndCompute(
+            scarface_image, None)
+        batmanImagePts, referenceImageDsc4 = sift.detectAndCompute(
+            batman_image, None)
         
 
         # FLANN parameters
@@ -291,6 +297,8 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
 
         MIN_MATCHES = len(starwarsImagePts) / 30
         MIN_MATCHES2 = len(avengersImagePts) / 30
+        MIN_MATCHES3 = len(scarfaceImagePts) / 30
+        MIN_MATCHES4 = len(batmanImagePts) / 30
 
         while True:
             frame = capture.read()
@@ -300,6 +308,8 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
             # Compute scene keypoints and its descriptors
             starwarsSourceImagePts, starwarsSourceImageDsc = sift.detectAndCompute(frame, None)
             avengersSourceImagePts, avengersSourceImageDsc = sift.detectAndCompute(frame, None)
+            scarfaceSourceImagePts, scarfaceSourceImageDsc = sift.detectAndCompute(frame, None)
+            batmanSourceImagePts, batmanSourceImageDsc = sift.detectAndCompute(frame, None)
 
 
             # ============== Matching =============
@@ -310,6 +320,10 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
                     referenceImageDsc, starwarsSourceImageDsc, k=2)
                 avengersMatches = flann.knnMatch(
                     referenceImageDsc2, avengersSourceImageDsc, k=2)
+                scarfaceMatches = flann.knnMatch(
+                    referenceImageDsc3, scarfaceSourceImageDsc, k=2)
+                batmanMatches = flann.knnMatch(
+                    referenceImageDsc4, batmanSourceImageDsc, k=2)
             except:
                 continue
 
@@ -317,6 +331,8 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
             ratio_thresh = 0.7
             starwars_good_matches = []
             avengers_good_matches = []
+            scarface_good_matches = []
+            batman_good_matches = []
 
             for m, n in starwarsMatches:
                 if m.distance < ratio_thresh*n.distance:
@@ -324,13 +340,40 @@ def augmentation_program(ret, matrix, distortion, r_vecs, t_vecs, tutorial):
             for m, n in avengersMatches:
                 if m.distance < ratio_thresh*n.distance:
                     avengers_good_matches.append(m)
+            for m, n in scarfaceMatches:
+                if m.distance < ratio_thresh*n.distance:
+                    scarface_good_matches.append(m)
+            for m, n in batmanMatches:
+                if m.distance < ratio_thresh*n.distance:
+                    batman_good_matches.append(m)
 
             # ============== Homography =============
             # Apply the homography transformation if we have enough good matches
             if len(starwars_good_matches) > MIN_MATCHES:
                 found_marker(frame, starwarsSourceImagePts, starwars_image, starwarsImagePts, starwars_good_matches, starwars_good_matches, two_cubes_obj, "Star wars TLY movie", False)  
             elif len(avengers_good_matches) > MIN_MATCHES2:
-                found_marker(frame, avengersSourceImagePts, avengers_image, avengersImagePts, avengers_good_matches, avengers_good_matches, five_cubes_obj, "Avengers Endgame movie", False)                
+                found_marker(frame, avengersSourceImagePts, avengers_image, avengersImagePts, avengers_good_matches, avengers_good_matches, four_cubes_obj, "Avengers Endgame movie", False)                
+            elif len(scarface_good_matches) > MIN_MATCHES3:
+                found_marker(frame, scarfaceSourceImagePts, scarface_image, scarfaceImagePts, scarface_good_matches, scarface_good_matches, three_cubes_obj, "Scarface Movie", False)                
+            elif len(batman_good_matches) > MIN_MATCHES4:
+                found_marker(frame, batmanSourceImagePts, batman_image, batmanImagePts, batman_good_matches, batman_good_matches, five_cubes_obj, "Batman Movie", False)     
+
+            
+            if(tutorial):
+                matchesMask = [[0,0] for i in range(len(matches))]
+
+                for i,(m,n) in enumerate(matches):
+                    if m.distance < 0.7*n.distance:
+                        matchesMask[i]=[1,0]
+
+                draw_params = dict(matchColor = (0,255,0),
+                    singlePointColor = (255,0,0),
+                    matchesMask = matchesMask,
+                    flags = cv.DrawMatchesFlags_DEFAULT)
+
+                img3 = cv.drawMatchesKnn(
+                    referenceImage, referenceImagePts, frame, sourceImagePts, matches, None, **draw_params)
+                plt.imshow(img3,), plt.show()           
 
             # show result
             cv.imshow("frame", frame)
