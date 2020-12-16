@@ -59,6 +59,11 @@ class CameraCapture:
 
 
 def cameraCalibration(capture, chessSize, amount):
+    '''
+    Calibrate the camera. 
+    Returns matrix, distortion, r_vecs, t_vecs, newCameraMtx, roi to be used for later calculation. 
+    The chessboard size and amount of image can be set in the settings
+    '''
     # Adjust this according to what calibration pattern you are using!
     checkerBoardSize = tuple(chessSize)
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 20, 0.001)
@@ -169,6 +174,9 @@ def render(frame, obj, projection, h, w, scale3d, color):
 
 
 def settingSetter(config):
+    '''
+    Menu for settings.
+    '''
     ans = True
     while ans:
         print("""
@@ -215,6 +223,9 @@ def settingSetter(config):
 
 
 def readConfig():
+    '''
+    Read config file and load configurations
+    '''
     config = {}
     if not os.path.exists('./config.json'):
         config['chessSize'] = (6, 6)
@@ -236,6 +247,9 @@ def readConfig():
 
 
 def saveConfig(config):
+    '''
+    Save current configuration to file
+    '''
     if config['matrix'] is not None:
         config['matrix'] = config['matrix'].tolist()
     if config['distMatrix'] is not None:
@@ -253,6 +267,9 @@ def saveConfig(config):
 
 
 def menu():
+    '''
+    Menu of the program
+    '''
     global capture, ret, matrix, distortion, r_vecs, t_vecs
     config = readConfig()
     capture = CameraCapture(0)
@@ -309,6 +326,9 @@ def menu():
 
 
 def found_marker(newCameraMtx, frame, sourceImagePts, referenceImage, referenceImagePts, matches, good_matches, cube_obj, text_obj, tutorial):
+    '''
+    Called when a marker has been found.
+    '''
     scale3d = 80
 
     # Get the good key points positions
@@ -379,23 +399,23 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
     # Load 3D model from OBJ file
     fox_obj = OBJ("./fox.obj", swapyz=True)
 
-    one_cube_obj = OBJ("./one_cube.obj", swapyz=True)
-    two_cubes_obj = OBJ("./two_cubes.obj", swapyz=True)
-    three_cubes_obj = OBJ("./three_cubes.obj", swapyz=True)
-    four_cubes_obj = OBJ("./four_cubes.obj", swapyz=True)
-    five_cubes_obj = OBJ("./five_cubes.obj", swapyz=True)
+    one_cube_obj = OBJ("./cubes/one_cube.obj", swapyz=True)
+    two_cubes_obj = OBJ("./cubes/two_cubes.obj", swapyz=True)
+    three_cubes_obj = OBJ("./cubes/three_cubes.obj", swapyz=True)
+    four_cubes_obj = OBJ("./cubes/four_cubes.obj", swapyz=True)
+    five_cubes_obj = OBJ("./cubes/five_cubes.obj", swapyz=True)
 
-    starwars_image = cv.imread("./starwars_poster.jpg", 0)
-    avengers_image = cv.imread("./endgame_poster.jpg", 0)
-    scarface_image = cv.imread("./scarface_poster.jpg", 0)
-    batman_image = cv.imread("./batman_poster.jpg", 0)
-    matrix_image = cv.imread("./matrix_poster.jpg", 0)
+    starwars_image = cv.imread("./images/starwars_poster.jpg", 0)
+    avengers_image = cv.imread("./images/endgame_poster.jpg", 0)
+    scarface_image = cv.imread("./images/scarface_poster.jpg", 0)
+    batman_image = cv.imread("./images/batman_poster.jpg", 0)
+    matrix_image = cv.imread("./images/matrix_poster.jpg", 0)
 
-    starwars_text_obj = OBJ("./starwars_text.obj", swapyz=True)
-    avengers_text_obj = OBJ("./avengers_text.obj", swapyz=True)
-    scarface_text_obj = OBJ("./scarface_text.obj", swapyz=True)
-    batman_text_obj = OBJ("./batman_text.obj", swapyz=True)
-    matrix_text_obj = OBJ("./matrix_text.obj", swapyz=True)
+    starwars_text_obj = OBJ("./text/starwars_text.obj", swapyz=True)
+    avengers_text_obj = OBJ("./text/avengers_text.obj", swapyz=True)
+    scarface_text_obj = OBJ("./text/scarface_text.obj", swapyz=True)
+    batman_text_obj = OBJ("./text/batman_text.obj", swapyz=True)
+    matrix_text_obj = OBJ("./text/matrix_text.obj", swapyz=True)
 
     # Scale 3D model
     scale3d = 1
