@@ -356,6 +356,10 @@ def found_marker(newCameraMtx, frame, sourceImagePts, referenceImage, referenceI
         return
 
     if(tutorial):
+        print("Image found!")
+        print("Homography matrix:")
+        print(homography)
+
         matchesMask = [[0, 0] for i in range(len(matches))]
 
         for i, (m, n) in enumerate(matches):
