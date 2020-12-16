@@ -182,13 +182,21 @@ def settingSetter(config):
             config['chessSize'] = (6, 6)
             config['matrix'] = None
             config['distMatrix'] = None
-            config['newMatrix'] = None
+            config['newCameraMtx'] = None
+            config['roi'] = None
+            config['imagesAmountPreparation'] = 3
             return config
         elif ans == "2":
-            width = input("New width?")
-            height = input("New height?")
-            config['chessSize'] = (width, height)
-            return config
+            try:
+                width = int(input("New width?"))
+                height = int(input("New height?"))
+            except:
+                print('Amount invalid')
+                continue
+            if width > 3 and height > 3:
+                config['chessSize'] = (width, height)
+                return config
+            print('Amount invalid')
         elif ans == "3":
             amount = 0
             while amount < 3:
@@ -236,6 +244,12 @@ def saveConfig(config):
         config['newCameraMtx'] = config['newCameraMtx'].tolist()
     with open('config.json', 'w') as f:
         json.dump(config, f)
+    if config['matrix'] is not None:
+        config['matrix'] = np.array(config['matrix'])
+    if config['distMatrix'] is not None:
+        config['distMatrix'] = np.array(config['distMatrix'])
+    if config['newCameraMtx'] is not None:
+        config['newCameraMtx'] = np.array(config['newCameraMtx'])
 
 
 def menu():
