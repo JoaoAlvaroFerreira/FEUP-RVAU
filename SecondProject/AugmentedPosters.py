@@ -437,10 +437,10 @@ def augmentation_program(matrix, newCameraMtx, distortion, tutorial, roi):
         # Apply the homography transformation if we have enough good matches
         if len(starwars_good_matches) > MIN_MATCHES:
             found_marker(newCameraMtx, frame, starwarsSourceImagePts, starwars_image, starwarsImagePts,
-                         starwars_good_matches, starwars_good_matches, two_cubes_obj, "Star wars TLY movie", tutorial)
+                         starwarsMatches, starwars_good_matches, two_cubes_obj, "Star wars TLY movie", tutorial)
         elif len(avengers_good_matches) > MIN_MATCHES2:
             found_marker(newCameraMtx, frame, avengersSourceImagePts, avengers_image, avengersImagePts,
-                         avengers_good_matches, avengers_good_matches, five_cubes_obj, "Avengers Endgame movie", tutorial)
+                         avengersMatches, avengers_good_matches, five_cubes_obj, "Avengers Endgame movie", tutorial)
 
         # show result
         cv.imshow("frame", frame)
